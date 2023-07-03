@@ -26,9 +26,9 @@ That is now the time to wait and accept client requests...In this context the se
 
 **prototype** : _int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)_;
 
-To understand select(), it basically allows a program (our server) to monitor multiple file descriptors, waiting untile one or more of the file descriptors is considered "ready" for some class of I/O operation (e.g. read(), write() operations).
+To understand select(), it basically allows a program (our server) to monitor multiple file descriptors, waiting until one or more of the file descriptors is considered "ready" for some class of I/O operation (e.g. read(), write() operations).
 
-The fd_set type of variables requires some deeper explanations...The select() function takes three "sets" of file descriptors (declared as fd_set) which allow the called to wait for three classes of events in the specified set of file descriptors.
+The fd_set type of variables requires some deeper explanations...The select() function takes three "sets" of file descriptors (declared as fd_set) which allow the caller to wait for three classes of events in the specified set of file descriptors.
 
 Here are some macros to work with fd_sets...
 
@@ -36,4 +36,4 @@ Here are some macros to work with fd_sets...
 
 **prototype** : _FD_SET()_ -> This macro adds the file descriptor fd to set. Adding a file descriptor that is already present in the set is a no-op, and does not produce an error.
 
-Note that select() is DESTRUCTIVE, meaning that 
+Note that select() is DESTRUCTIVE, meaning that it changes the fd_set (passed as parameter).
