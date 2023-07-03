@@ -45,6 +45,7 @@ int	main(int argc, char **argv) {
 
     std::string message;
     char        buffer[1024];
+    char        received[1024];
     while (true) {
 
         memset(buffer, 0, 1024); //clear buffer
@@ -52,6 +53,9 @@ int	main(int argc, char **argv) {
 
         strcpy(buffer, message.c_str());
         send(sockfd, buffer, strlen(buffer), 0);
+        
+        int data_exchange = recv(sockfd, received, sizeof(received), 0);
+        std::cout << received << std::endl;
     }
 
     return (0);

@@ -10,6 +10,17 @@
 
 #include "./utils.hpp"
 
+
+// void forwardMessage(fd_set* clientSockets, int senderSocket, const char* message, int messageSize) {
+//     for (int i = 0; i < FD_SETSIZE; i++) {
+//         if (i != senderSocket && FD_ISSET(i, clientSockets)) {
+//             if (send(i, message, messageSize, 0) == -1) {
+//                 std::cerr << "Error sending message to client " << i << std::endl;
+//             }
+//         }
+//     }
+// }
+
 int	main(int argc, char **argv) {
 
     /*  Step 1 : Verify the arguments */
@@ -47,7 +58,7 @@ int	main(int argc, char **argv) {
     }
 
     int opt = 1;
-    //set listening socjet to allow multiple connections
+    //set listening socket to allow multiple connections
     // if (setsockopt(listening_sockfd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt) == -1))
     // {
     //     std::cerr << "Error : setsockopt() did not worl." << std::endl;
@@ -59,7 +70,7 @@ int	main(int argc, char **argv) {
     struct sockaddr_in  server_hint;
     int                 server_len = sizeof(server_hint);
     
-    server_hint.sin_family = AF_INET; //corresponds to the address family (refers to eith TCP or UDP type)
+    server_hint.sin_family = AF_INET; //corresponds to the address family (refers to either TCP or UDP type)
     server_hint.sin_port = htons(sockport); //host to network short
     server_hint.sin_addr.s_addr = inet_addr("127.0.0.1"); //corresponds to the IP address of my machine sincer both server and client are on my machine
 
@@ -92,7 +103,7 @@ int	main(int argc, char **argv) {
     int             data_exchange;
     char            buffer[1024];
     
-    fd_set current_sockets, ready_sockets; //set of socket descriptors
+    fd_set current_sockets, readyToRead_sockets; //set of socket descriptors
 
     
     //clear the socket set
@@ -104,20 +115,21 @@ int	main(int argc, char **argv) {
 
     while (true) {
 
-        ready_sockets = current_sockets;
+        readyToRead_sockets = current_sockets; //current_sockets corresponds to the set of file descriptors I want to keep an eye on
 
-        if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0)
+        if (select(FD_SETSIZE, &readyToRead_sockets, NULL, NULL, NULL) < 0)
         {
             std::cerr << "Error : Problem with file descriptor set." << std::endl;
             return (1);
         }
-
+        //at that point, readyToRead_sockets contains all the file descriptors that are ready for reading
         for (int i = 0; i < FD_SETSIZE; i++)
         {
-            if(FD_ISSET(i, &ready_sockets))
+            //we start from 0 and check which one is ready
+            if(FD_ISSET(i, &readyToRead_sockets))
             {
                 if (i == listening_sockfd) {
-                //this is a new connection
+                //if the file descriptor i is the server socket, it means there is a new connection incoming
                     if ((new_socket = accept(listening_sockfd, (struct sockaddr*)&server_hint,
                         (socklen_t*)&server_len)) == -1)
                     {
@@ -125,18 +137,20 @@ int	main(int argc, char **argv) {
                         return (1);        
                     }
                     printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(server_hint.sin_addr) , ntohs(server_hint.sin_port));
+                    //the new socket is added to current_sockets (the set of sockets we want to keen an eye on)
                     FD_SET(new_socket, &current_sockets);
                 }
                 else 
                 {
+                    //the socket is an already existing client socket ready to be read
                     memset(buffer, 0, 1024);
-                    int data_exchange = recv(i, buffer, sizeof(buffer), 0);
-                    if (data_exchange == -1) {
+                    int bytes_received = recv(i, buffer, sizeof(buffer), 0);
+                    if (bytes_received == -1) {
                         std::cerr << "Error: Connection issue while exchanging messages." << std::endl;
                         close(i);
                         FD_CLR(i, &current_sockets);
                     }
-                    else if (data_exchange == 0) {
+                    else if (bytes_received == 0) {
                     // Client disconnected
                         printf("Client disconnected, socket fd is %d\n", i);
                         close(i);
@@ -144,8 +158,10 @@ int	main(int argc, char **argv) {
                     }
                     else {
                         std::cout << "Message received from socket " << i << ": " << buffer << std::endl;
-                     // Process the message as needed
-
+                        //sending back the message to other clients
+                        send(i, buffer, sizeof(buffer), MSG_CONFIRM);
+                        // FD_CLR(i, &current_sockets);
+                        // forwardMessage(&current_sockets, i, buffer, bytes_received);
                     // Optionally, you can send a response back to the client
                     // const char* response = "Message received";
                     // send(i, response, strlen(response), 0);
@@ -154,6 +170,6 @@ int	main(int argc, char **argv) {
             }
         }
     }
-    //close(client_sockfd);
+    close(listening_sockfd);
     return (0);
 }
