@@ -7,20 +7,23 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+#include <vector>
 
 #include "./utils.hpp"
 
 
-// void forwardMessage(fd_set* clientSockets, int senderSocket, const char* message, int messageSize) {
-//     for (int i = 0; i < FD_SETSIZE; i++) {
-//         if (i != senderSocket && FD_ISSET(i, clientSockets)) {
-//             if (send(i, message, messageSize, 0) == -1) {
-//                 std::cerr << "Error sending message to client " << i << std::endl;
-//             }
-//         }
-//     }
-// }
+void    forwardMessage(char *msg, int receiver)
+{
+  	// int ret;
+	// int already_sent = 0;
+	// int msg_len = strlen( msg );
 
+	// while ( already_sent < msg_len ) {
+	// 	if ( !send(receiver, msg + already_sent, msg_len - already_sent, MSG_DONTWAIT) )
+	// 		return ;
+	// 	already_sent += ret;
+	// }  
+}
 int	main(int argc, char **argv) {
 
     /*  Step 1 : Verify the arguments */
@@ -98,47 +101,55 @@ int	main(int argc, char **argv) {
     
     /* Step 5 : Wait and accept client request */
 
-
-    int             new_socket, socket_desc;
-    int             data_exchange;
-    char            buffer[1024];
+    int                 new_socket;
+    int                 data_exchange;
+    char                buffer[1024];
+    std::vector<int>    all_sockets;
     
-    fd_set current_sockets, readyToRead_sockets; //set of socket descriptors
+    fd_set              original_sockets, ready_sockets; //set of socket descriptors
 
     
     //clear the socket set
-    FD_ZERO(&current_sockets); //clears all files from set readfds
+    FD_ZERO(&original_sockets); //clears all files from set readfds
     
     //add master socket to set
-    FD_SET(listening_sockfd, &current_sockets);
+    FD_SET(listening_sockfd, &original_sockets);
     // max_fd = listening_sockfd;
 
     while (true) {
 
-        readyToRead_sockets = current_sockets; //current_sockets corresponds to the set of file descriptors I want to keep an eye on
+        ready_sockets = original_sockets; //original_sockets corresponds to the set of file descriptors I want to keep an eye on
 
-        if (select(FD_SETSIZE, &readyToRead_sockets, NULL, NULL, NULL) < 0)
+        if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0)
         {
             std::cerr << "Error : Problem with file descriptor set." << std::endl;
             return (1);
         }
-        //at that point, readyToRead_sockets contains all the file descriptors that are ready for reading
+        //at that point, ready_sockets contains all the file descriptors that are ready for reading
         for (int i = 0; i < FD_SETSIZE; i++)
         {
             //we start from 0 and check which one is ready
-            if(FD_ISSET(i, &readyToRead_sockets))
+            if(FD_ISSET(i, &ready_sockets))
             {
                 if (i == listening_sockfd) {
                 //if the file descriptor i is the server socket, it means there is a new connection incoming
-                    if ((new_socket = accept(listening_sockfd, (struct sockaddr*)&server_hint,
-                        (socklen_t*)&server_len)) == -1)
+                    struct sockaddr_in  client_hint;
+                    socklen_t           client_len = sizeof(client_hint);
+
+                    if ((new_socket = accept(listening_sockfd, (struct sockaddr*)&client_hint,
+                        (socklen_t*)&client_len)) == -1)
                     {
                         std::cerr << "Error : Server socket could not accept connection." << std::endl;
                         return (1);        
                     }
                     printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(server_hint.sin_addr) , ntohs(server_hint.sin_port));
-                    //the new socket is added to current_sockets (the set of sockets we want to keen an eye on)
-                    FD_SET(new_socket, &current_sockets);
+                    //the new socket is added to original_sockets (the set of sockets we want to keen an eye on)
+                    FD_SET(new_socket, &original_sockets);
+                    all_sockets.push_back(new_socket);
+                    for (int i = 0; i < all_sockets.size(); i++)
+                    {
+                        std::cout << "New in : " << all_sockets[i] << std::endl;
+                    }
                 }
                 else 
                 {
@@ -148,20 +159,27 @@ int	main(int argc, char **argv) {
                     if (bytes_received == -1) {
                         std::cerr << "Error: Connection issue while exchanging messages." << std::endl;
                         close(i);
-                        FD_CLR(i, &current_sockets);
+                        FD_CLR(i, &original_sockets); //clearing that socket from the list of sockets I am monitoring
                     }
                     else if (bytes_received == 0) {
                     // Client disconnected
                         printf("Client disconnected, socket fd is %d\n", i);
                         close(i);
-                        FD_CLR(i, &current_sockets);
+                        FD_CLR(i, &original_sockets); //clearing that socket from the list of sockets I am monitoring
                     }
                     else {
                         std::cout << "Message received from socket " << i << ": " << buffer << std::endl;
                         //sending back the message to other clients
-                        send(i, buffer, sizeof(buffer), MSG_CONFIRM);
-                        // FD_CLR(i, &current_sockets);
-                        // forwardMessage(&current_sockets, i, buffer, bytes_received);
+                        for (int j = 0; j < all_sockets.size(); j++)
+                        {
+                            std::cout << "Checking sock: " << all_sockets[j] << std::endl;
+                            if (all_sockets[j] != i)
+                            {
+                                std::cout << "Message being sent to : " << all_sockets[j] << std::endl;
+                                send(all_sockets[j], buffer, strlen(buffer), 0);
+                            }
+                        }
+                        // FD_CLR(i, &original_sockets);
                     // Optionally, you can send a response back to the client
                     // const char* response = "Message received";
                     // send(i, response, strlen(response), 0);

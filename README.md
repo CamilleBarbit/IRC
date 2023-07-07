@@ -2,8 +2,13 @@
 
 ## Important variables
 
-1) Define the server's port,
-2) Create the master socket (aka the always listening socket) -> This variable is nothing else thant the file decriptor returned by the function socket().
+1) The server's port (type : _int_).
+2) The master socket (aka the always listening socket) -> This variable is nothing else thant the file decriptor returned by the function socket() (type : _int_).
+3) The sockaddr_in structure -> This variable enables to bind the IP address and the port to the socket.
+
+## Other variables
+
+1) SOMAXCONN is a global variable that corresponds to the maximum number of pending connection requests queued for any listening socket. The minimum value is 1, the maximum value is 2147483647, and the default value is 1024
 
 
 ## When does it all start ?
@@ -17,18 +22,18 @@ When the socket is properly bound, it is ready to **listen** to any client reque
 
 **prototype** : _int listen(int sockfd, int backlog)_;
 
-_The backlog argument defines the maximum length to which the queue of pending connections for sockfd may grow (aka the total number of clients that the server is able to deal with at the same time)_.
+_The backlog argument defines the maximum length to which the queue of pending connections for sockfd may grow (aka the total number of clients that the server is able to deal with at the same time). In this case, we use the global variable SOMAXCONN as backlog_.
 
 
 ## Ready To Get Tricky !
 
-That is now the time to wait and accept client requests...In this context the select() function is of particular interest.
+That is now the time to **wait and accept** client requests...In this context the select() function is of particular interest.
 
 **prototype** : _int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)_;
 
 To understand select(), it basically allows a program (our server) to monitor multiple file descriptors, waiting until one or more of the file descriptors is considered "ready" for some class of I/O operation (e.g. read(), write() operations).
 
-The fd_set type of variables requires some deeper explanations...The select() function takes three "sets" of file descriptors (declared as fd_set) which allow the caller to wait for three classes of events in the specified set of file descriptors.
+The fd_set type of variables requires some deeper explanations...The select() function takes three "sets" of file descriptors (declared as _fd_set_) which allow the caller to wait for three classes of events in the specified set of file descriptors.
 
 Here are some macros to work with fd_sets...
 
