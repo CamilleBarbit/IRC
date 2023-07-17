@@ -48,13 +48,18 @@ int	main(int argc, char **argv) {
     char        received[1024];
     while (true) {
 
-        memset(buffer, 0, 1024); //clear buffer
+        //memset(buffer, 0, 1024); //clear buffer
+        //memset(received, 0, 1024); //clear buffer
+        bzero(buffer, 1024);
+        bzero(received, 1024);
+
         std::getline(std::cin, message);
 
         strcpy(buffer, message.c_str());
         send(sockfd, buffer, strlen(buffer), 0);
         
-        int data_exchange = recv(sockfd, received, sizeof(received), 0);
+        int bytes_received = recv(sockfd, received, sizeof(received), 0);
+        received[bytes_received] = '\0';
         std::cout << received << std::endl;
     }
 
