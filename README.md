@@ -85,11 +85,13 @@ FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** 
 
 **Structure prototype** : 
 
->   typedef struct  s_infos {
-> 
->   int                 server_sockfd;
->   int                 server_sockport;
->   std::vector<int>    all_sockfds;
->   fd_set              original_fd, ready_fd; //set of socket descriptors
-> 
->   } t_infos;
+'''c++
+    typedef struct  s_infos {
+ 
+        int                 server_sockfd;
+        int                 server_sockport;
+        std::vector<int> all_sockfds;
+        fd_set              original_fd, ready_fd; //set of socket descriptors
+ 
+    } t_infos;
+'''
