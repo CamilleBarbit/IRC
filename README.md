@@ -53,31 +53,31 @@ FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** 
 
 >       int new_client(t_infos *key_infos)
 >       {
->>       struct sockaddr_in  client_hint;
->>       socklen_t           client_len = sizeof(client_hint);
->>       int                 new_sockfd;
->>       char                new_msg[100];
->>
->>       if ((new_sockfd = accept(key_infos->server_sockfd, (struct sockaddr*)&client_hint, (socklen_t*)&client_len)) == -1)
->>       {
->>           std::cerr << "Error : Server socket could not accept new connection." << std::endl;
->>           return (-1);        
->>       }
->>       printf("New connection, client socket fd is %d , ip is : %s , port : %d \n", new_sockfd, inet_ntoa(client_hint.sin_addr), ntohs(client_hint.sin_port));
->>    
->>       //the new socket is added to original_fd (the set of sockets we want to keen an eye on)
->>       FD_SET(new_sockfd, &key_infos->original_fd);
->>       
->>       key_infos->all_sockfds.push_back(new_sockfd);
->>       for (int i = 0; i < key_infos->all_sockfds.size(); i++)
->>       {
->>           std::cout << "New in : " << key_infos->all_sockfds[i] << std::endl;
->>       }
->>       
->>       //writing a message to let all clients know a new client successfully connected
->>       sprintf(new_msg, "From server: Client %d successfully connected to the server !\n", new_sockfd);
->>       send_message(key_infos, new_sockfd, new_msg);
->>    
->>       return (0);
+>       struct sockaddr_in  client_hint;
+>       socklen_t           client_len = sizeof(client_hint);
+>       int                 new_sockfd;
+>       char                new_msg[100];
+>
+>       if ((new_sockfd = accept(key_infos->server_sockfd, (struct sockaddr*)&client_hint, (socklen_t*)&client_len)) == -1)
+>       {
+>           std::cerr << "Error : Server socket could not accept new connection." << std::endl;
+>           return (-1);        
+>       }
+>       printf("New connection, client socket fd is %d , ip is : %s , port : %d \n", new_sockfd, inet_ntoa(client_hint.sin_addr), ntohs(client_hint.sin_port));
+>    
+>       //the new socket is added to original_fd (the set of sockets we want to keen an eye on)
+>       FD_SET(new_sockfd, &key_infos->original_fd);
+>       
+>       key_infos->all_sockfds.push_back(new_sockfd);
+>       for (int i = 0; i < key_infos->all_sockfds.size(); i++)
+>       {
+>           std::cout << "New in : " << key_infos->all_sockfds[i] << std::endl;
+>       }
+>       
+>       //writing a message to let all clients know a new client successfully connected
+>       sprintf(new_msg, "From server: Client %d successfully connected to the server !\n", new_sockfd);
+>       send_message(key_infos, new_sockfd, new_msg);
+>    
+>       return (0);
 >       }
 
