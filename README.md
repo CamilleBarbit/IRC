@@ -51,47 +51,49 @@ FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** 
 **if (FD_ISSET(server_sockfd, ready_fd))**
     It means that a **new client** is trying to connect to the server !
 
->       int new_client(t_infos *key_infos)
->       {
->       struct sockaddr_in  client_hint;
->       socklen_t           client_len = sizeof(client_hint);
->       int                 new_sockfd;
->       char                new_msg[100];
->
->       if ((new_sockfd = accept(key_infos->server_sockfd, (struct sockaddr*)&client_hint, (socklen_t*)&client_len)) == -1)
->       {
->           std::cerr << "Error : Server socket could not accept new connection." << std::endl;
->           return (-1);        
->       }
->       printf("New connection, client socket fd is %d , ip is : %s , port : %d \n", new_sockfd, inet_ntoa(client_hint.sin_addr), ntohs(client_hint.sin_port));
->    
->       //the new socket is added to original_fd (the set of sockets we want to keen an eye on)
->       FD_SET(new_sockfd, &key_infos->original_fd);
->       
->       key_infos->all_sockfds.push_back(new_sockfd);
->       for (int i = 0; i < key_infos->all_sockfds.size(); i++)
->       {
->           std::cout << "New in : " << key_infos->all_sockfds[i] << std::endl;
->       }
->       
->       //writing a message to let all clients know a new client successfully connected
->       sprintf(new_msg, "From server: Client %d successfully connected to the server !\n", new_sockfd);
->       send_message(key_infos, new_sockfd, new_msg);
->    
->       return (0);
->       }
+```
+    int new_client(t_infos *key_infos)
+    {
+        struct sockaddr_in  client_hint;
+        socklen_t           client_len = sizeof(client_hint);
+        int                 new_sockfd;
+        char                new_msg[100];
+
+        if ((new_sockfd = accept(key_infos->server_sockfd, (struct sockaddr*)&client_hint, (socklen_t*)&client_len)) == -1)
+        {
+            std::cerr << "Error : Server socket could not accept new connection." << std::endl;
+            return (-1);        
+        }
+        printf("New connection, client socket fd is %d , ip is : %s , port : %d \n", new_sockfd, inet_ntoa(client_hint.sin_addr), ntohs(client_hint.sin_port));
+    
+        //the new socket is added to original_fd (the set of sockets we want to keen an eye on)
+        FD_SET(new_sockfd, &key_infos->original_fd);
+
+        key_infos->all_sockfds.push_back(new_sockfd);
+        for (int i = 0; i < key_infos->all_sockfds.size(); i++)
+        {
+            std::cout << "New in : " << key_infos->all_sockfds[i] << std::endl;
+        }
+
+        //writing a message to let all clients know a new client successfully connected
+        sprintf(new_msg, "From server: Client %d successfully connected to the server !\n", new_sockfd);
+        send_message(key_infos, new_sockfd, new_msg);
+        
+        return (0);
+    }
+```
 
 **More in depth** : **key_infos** is a structure that contains important information that need to be kept. The propotype is given below. key_infos->all_sockfds is a vector that contains all the fds of the clients currently connected to the server. It enables to "keep track" of what is happening and monitor the right fds.
 
 **Structure prototype** : 
 
-'''c++
+```
     typedef struct  s_infos {
  
         int                 server_sockfd;
         int                 server_sockport;
-        std::vector<int> all_sockfds;
+        std::vector<int>    all_sockfds;
         fd_set              original_fd, ready_fd; //set of socket descriptors
  
     } t_infos;
-'''
+```
