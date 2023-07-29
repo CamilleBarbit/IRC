@@ -81,3 +81,15 @@ FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** 
 >       return (0);
 >       }
 
+**More in depth** : **key_infos** is a structure that contains important information that need to be kept. The propotype is given below. key_infos->all_sockfds is a vector that contains all the fds of the clients currently connected to the server. It enables to "keep track" of what is happening and monitor the right fds.
+
+**Structure prototype** : 
+
+> typedef struct  s_infos {
+> 
+>     int                 server_sockfd;
+>     int                 server_sockport;
+>     std::vector<int>    all_sockfds;
+>     fd_set              original_fd, ready_fd; //set of socket descriptors
+> 
+> } t_infos;
