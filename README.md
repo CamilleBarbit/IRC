@@ -51,8 +51,8 @@ FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** 
 **if (FD_ISSET(server_sockfd, ready_fd))**
     It means that a **new client** is trying to connect to the server !
 
->   int new_client(t_infos *key_infos)
->   {
+>       int new_client(t_infos *key_infos)
+>       {
 >       struct sockaddr_in  client_hint;
 >       socklen_t           client_len = sizeof(client_hint);
 >       int                 new_sockfd;
@@ -79,5 +79,5 @@ FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** 
 >       send_message(key_infos, new_sockfd, new_msg);
 >    
 >       return (0);
->   }
+>       }
 
