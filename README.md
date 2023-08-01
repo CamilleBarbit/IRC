@@ -111,4 +111,6 @@ If the function returns 0, it means that a client has closed the connection by s
 
 If you want to try your server, you can either create your own (which I attempted) or you can use netcat (nc) command. It is a command-line utility that reads and writes data across network connections, using the TCP or UDP protocols.
 
-It works the following way : Launch you server and open as many other windows as you like (depending on how many you want clients) and run the following command : _nc [options] host port_ with host being the address and port of the server.
+It works the following way : Launch you server and open as many other windows as you like (depending on how many you want clients) and run the following command : **_nc [options] host port_** with host being the address and port of the server.
+
+As for the server's address and port, refer to the sockaddr_in variable where all server's info are stored !
