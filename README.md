@@ -105,7 +105,7 @@ The function recv() handles client requests. Wait, how does that work ?
 
 This function is used to receive messages from a socket. It is possible to understand recv() as an equivalent to read(). It returns the length of the message on successfull completion. In case of error, the function returns (-1).
 
-If the function returns 0, it means that a client has closed the connection by sending a signal ctrl + c, for instance. An orderly closure will not lead to any error. If an error occur when closing the connection, it undeniably means that something went wrong -> if client closed his side without reading sent data (sent by the server or other client). This case, in particular, occured to me and the function recv() returned an **ECONNRESET error** ("A connection was forcibly closed by a peer").
+If the function returns 0, it means that a client has closed the connection by sending a signal ctrl + c, for instance. An orderly closure will not lead to any error. If an error occurs when closing the connection, it undeniably means that something went wrong -> if client closed his side without reading sent data (sent by the server or other client). This case, in particular, occured to me and the function recv() returned an **ECONNRESET error** ("A connection was forcibly closed by a peer").
 
 ### TIPS ##
 
