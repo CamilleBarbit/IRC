@@ -1,5 +1,15 @@
 #include "./utils.hpp"
 
+
+int	mylen(char *buff) {
+
+	int i = 0;
+
+	while (buff[i] != '\0')
+		i++;
+	return (i);
+}
+
 int myAtoi(const char *str) {
 
     int i = 0;

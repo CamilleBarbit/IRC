@@ -13,6 +13,8 @@ int	main(int argc, char **argv) {
 
     int sockfd;
 
+    int server_fd = myAtoi(argv[1]);
+
     if ((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
     //AF_INET corresponds to IPv4 and SOCK_STREAM corresponds to TCP
     {
@@ -45,22 +47,23 @@ int	main(int argc, char **argv) {
 
     std::string message;
     char        buffer[1024];
-    char        received[1024];
     while (true) {
 
         //memset(buffer, 0, 1024); //clear buffer
         //memset(received, 0, 1024); //clear buffer
         bzero(buffer, 1024);
-        bzero(received, 1024);
 
         std::getline(std::cin, message);
 
         strcpy(buffer, message.c_str());
-        send(sockfd, buffer, strlen(buffer), 0);
+        std::cout << "The buffer sent to server is: " << buffer << std::endl;
+        send(server_fd, buffer, strlen(buffer), 0);
         
-        int bytes_received = recv(sockfd, received, sizeof(received), 0);
-        received[bytes_received] = '\0';
-        std::cout << received << std::endl;
+        message.clear();
+        bzero(buffer, 1024);
+        
+        int bytes_received = recv(server_fd, buffer, sizeof(buffer), 0);
+        buffer[bytes_received] = '\0';
     }
 
     return (0);

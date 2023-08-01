@@ -48,8 +48,7 @@ Note that select() is DESTRUCTIVE, meaning that it changes the fd_set (passed as
 
 FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** (i.e. the server's file descriptor) is still in the readfds set once the select() function has been called.
 
-**if (FD_ISSET(server_sockfd, ready_fd))**
-    It means that a **new client** is trying to connect to the server !
+**if (FD_ISSET(server_sockfd, ready_fd))**... It means that a **new client** is trying to connect to the server !
 
 ```
     int new_client(t_infos *key_infos)
@@ -97,3 +96,19 @@ FD_ISSET(**server_sockfd**, &ready_fd) is used to test if the **server_sockfd** 
  
     } t_infos;
 ```
+
+### Deal With Already Connected Clients
+
+The function recv() handles client requests. Wait, how does that work ?
+
+**prototype** : _ssize_t recv(int sockfd, void buf[.len], size_t len, int flags)_;
+
+This function is used to receive messages from a socket. It is possible to understand recv() as an equivalent to read(). It returns the length of the message on successfull completion. In case of error, the function returns (-1).
+
+If the function returns 0, it means that a client has closed the connection by sending a signal ctrl + c, for instance. An orderly closure will not lead to any error. If an error occur when closing the connection, it undeniably means that something went wrong -> if client closed his side without reading sent data (sent by the server or other client). This case, in particular, occured to me and the function recv() returned an **ECONNRESET error** ("A connection was forcibly closed by a peer").
+
+### TIPS ##
+
+If you want to try your server, you can either create your own (which I attempted) or you can use netcat (nc) command. It is a command-line utility that reads and writes data across network connections, using the TCP or UDP protocols.
+
+It works the following way : Launch you server and open as many other windows as you like (depending on how many you want clients) and run the following command : _nc [options] host port_ with host being the address and port of the server.

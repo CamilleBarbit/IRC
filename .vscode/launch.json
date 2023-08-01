@@ -1,0 +1,12 @@
+{
+	"version": "0.2.0",
+	"configuration": [{
+	  "name": "C++ Launch",
+	  "type": "cppdbg",
+	  "request": "launch",
+	  "program": "/home/camillebt/42Projects/IRC/a.out",
+	  "args": ["", ""],
+	  "environment": [{ "name": "config", "value": "Debug" }],
+	  "cwd": "/home/camillebt/42Projects/IRC"
+	}]
+}
