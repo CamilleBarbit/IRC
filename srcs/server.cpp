@@ -125,7 +125,7 @@ int new_client(t_infos *key_infos)
     return (0);
 }
 
-void    erase_vector_value(t_infos *key_infos, int client_fd)
+void    erase_fd(t_infos *key_infos, int client_fd)
 {
     int j = 0;
     for (unsigned int i = 0; i < key_infos->all_sockfds.size(); i++)
@@ -143,7 +143,7 @@ int handle_request(t_infos *key_infos, int client_fd)
 
     if (bytes_received == -1) {
         std::cerr << "Error: Connection issue while exchanging messages." << std::endl;
-        erase_vector_value(key_infos, client_fd);
+        erase_fd(key_infos, client_fd);
         FD_CLR(client_fd, &key_infos->original_fd); //clearing that socket from the list of sockets I am monitoring
         close(client_fd);
         return (-1);
@@ -156,7 +156,7 @@ int handle_request(t_infos *key_infos, int client_fd)
         //writing a message to let all clients know a new client successfully disconnected
         sprintf(goodbye_msg, "From server: Client %d successfully disconnected from the server !\n", client_fd);
         send_message(key_infos, client_fd, goodbye_msg);
-        erase_vector_value(key_infos, client_fd);
+        erase_fd(key_infos, client_fd);
         FD_CLR(client_fd, &key_infos->original_fd); //clearing that socket from the list of sockets I am monitoring
         close(client_fd);
         return (0);

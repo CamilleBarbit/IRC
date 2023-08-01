@@ -34,7 +34,7 @@ int     run_server(t_infos *key_infos);
 int     handle_request(t_infos *key_infos, int client_fd);
 int     new_client(t_infos *key_infos);
 int     start_server(t_infos *key_infos);
-void    erase_vector_value(t_infos *key_infos, int client_fd);
+void    erase_fd(t_infos *key_infos, int client_fd);
 void    send_message(t_infos *key_infos, int sender_fd, char *msg);
 void    decorticate_message(int targeted_client, char *msg);
 
