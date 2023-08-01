@@ -1,4 +1,4 @@
-# My Own Internet Relay Chat (IRC)
+# My Own Internet Relay Chat (IRC) - Start With the Basics
 
 ## Important Variables
 
