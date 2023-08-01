@@ -1,6 +1,7 @@
 #ifndef UTILS_HPP
 # define UTILS_HPP
 
+/* Libraries*/
 
 #include <sys/socket.h>
 #include <stdio.h>
@@ -28,7 +29,7 @@ typedef struct  s_infos {
 /* Functions */
 
 int     myAtoi(const char *str);
-int	    mylen(char *buff);
+int     mylen(char *buff);
 int     run_server(t_infos *key_infos);
 int     handle_request(t_infos *key_infos, int client_fd);
 int     new_client(t_infos *key_infos);
