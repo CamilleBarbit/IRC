@@ -104,7 +104,7 @@ int new_client(t_infos *key_infos)
     struct sockaddr_in  client_hint;
     socklen_t           client_len = sizeof(client_hint);
     int                 new_sockfd;
-    char                new_msg[100];
+    char                welcome_msg[100];
 
     if ((new_sockfd = accept(key_infos->server_sockfd, (struct sockaddr*)&client_hint, (socklen_t*)&client_len)) == -1)
     {
@@ -119,8 +119,8 @@ int new_client(t_infos *key_infos)
     key_infos->all_sockfds.push_back(new_sockfd);
     
     //writing a message to let all clients know a new client successfully connected
-    sprintf(new_msg, "From server: Client %d successfully connected to the server !\n", new_sockfd);
-    send_message(key_infos, new_sockfd, new_msg);
+    sprintf(welcome_msg, "From server: Client %d successfully connected to the server !\n", new_sockfd);
+    send_message(key_infos, new_sockfd, welcome_msg);
     
     return (0);
 }
